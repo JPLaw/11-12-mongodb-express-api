@@ -72,3 +72,60 @@ describe('POST requests to /api/puppy', () => {
     });
 });
 
+describe('GET requests to /api/puppy', () => {
+    test('200 GET for succesful fetching of a puppy', () => {
+      let mockPuppyForGet;
+      return createPuppyMockPromise()
+        .then((puppy) => {
+          mockPuppyForGet = puppy;
+          // I can return this to the next then block because superagent requests are also promisfied
+          return superagent.get(`${apiUrl}/${mockPuppyForGet._id}`);
+        })
+        .then((response) => {
+          expect(response.status).toEqual(200);
+          expect(response.body.name).toEqual(mockPuppyForGet.name);
+          expect(response.body.breed).toEqual(mockPuppyForGet.breed);
+        })
+        .catch((err) => {
+          throw err;
+        });
+    });
+  
+    test('404 GET: no puppy with this id', () => {
+      return superagent.get(`${apiUrl}/THISISABADID`)
+        .then((response) => {
+          throw response;
+        })
+        .catch((err) => {
+          expect(err.status).toEqual(404);
+        });
+    });
+  });
+  
+  describe('PUT request to /api/puppy', () => {
+    test('200 PUT for successful update of a resource', () => {
+      return createPuppyMockPromise()
+        .then((newPuppy) => {
+          return superagent.put(`${apiUrl}/${newPuppy._id}`)
+            .send({ name: 'updated name', breed: 'updated breed' })
+            .then((response) => {
+              expect(response.status).toEqual(200);
+              expect(response.body.name).toEqual('updated name');
+              expect(response.body.breed).toEqual('updated breed');
+              expect(response.body._id.toString()).toEqual(newPuppy._id.toString());
+            })
+            .catch((err) => {
+              throw err;
+            });
+        })
+        .catch((err) => {
+          throw err;
+        });
+    });
+  });
+
+  describe('DELETE request to api/puppy', () => {
+      test('200 DELETE for a successful deletion of a resource', () => {
+          
+      })
+  })

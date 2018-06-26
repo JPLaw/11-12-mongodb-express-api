@@ -5,7 +5,7 @@ import superagent from 'superagent';
 import Puppy from '../model/puppy';
 import { startServer, stopServer } from '../lib/server';
 // import { notEqual } from 'assert';
-let server;
+// let server;
 const apiUrl = `http://localhost:${process.env.PORT}/api/puppy`;
 
 const createPuppyMockPromise = () => {
@@ -21,7 +21,7 @@ afterAll(stopServer);
 afterEach(() => Puppy.remove({}));
 
 describe('POST requests to /api/puppy', () => {
-  test('POST 200 for successful creation of note', () => {
+  test('POST 200 for successful creation of puppy', () => {
     const mockPuppyToPost = {
       name: faker.lorem.words(1),
       breed: faker.lorem.words(2),
@@ -40,7 +40,7 @@ describe('POST requests to /api/puppy', () => {
       });
   });
 
-  it('should POST 400 for not sending in a required NAME property', () => {
+  test('POST 400 for not sending in a required NAME property', () => {
     const mockPuppyToPost = {
       breed: faker.lorem.words(2),
     };
@@ -54,7 +54,7 @@ describe('POST requests to /api/puppy', () => {
       });
   });
 
-  it('should POST 409 for a duplicate key', () => {
+  test('POST 409 for a duplicate key', () => {
     return createPuppyMockPromise()
       .then((newPuppy) => {
         return superagent.post(apiUrl)
@@ -126,37 +126,28 @@ describe('PUT request to /api/puppy', () => {
 
 describe('DELETE request to api/puppy/', () => {
   test('204 DELETE for a successful deletion of a resource', () => {
-    let mockPuppyForGet;
+    let mockPuppyForDelete;
     return createPuppyMockPromise()
       .then((puppy) => {
-        mockPuppyForGet = puppy;
-        return superagent.delete(`${apiUrl}/${mockPuppyForGet._id}`);
+        mockPuppyForDelete = puppy;
+        return superagent.delete(`${apiUrl}/${mockPuppyForDelete._id}`);
       })
       .then((response) => {
         expect(response.status).toEqual(204);
       })
+    //   .catch();
       .catch((err) => {
         throw err;
       });
   });
-  
-  test('400 DELETE for missing puppy id', () => {
-    return superagent.delete(`${apiUrl}`)
+
+  test('400 DELETE- there is no puppy that matches this id', () => {
+    return superagent.delete(`${apiUrl}/THISISABADID`)
       .then((response) => {
         throw response;
       })
       .catch((err) => {
         expect(err.status).toEqual(400);
-      });
-  });
-
-  test('404 DELETE- there is no puppy that matches this id', () => {
-    return superagent.delete(`${apiUrl}/thiswontwork`)
-      .then((response) => {
-        throw response;
-      })
-      .catch((err) => {
-        expect(err.status).toEqual(404);
       });
   });
 });

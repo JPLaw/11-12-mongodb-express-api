@@ -58,9 +58,26 @@ puppyRouter.get('/api/puppy/:id?', (request, response) => {
 
   // TODO:
   // if (!request.params.id) do logic here to return an array of all resources, else do the logic below
+
   //   if (!request.params.id) {
-    
+  //     return Puppy.find({})
+  //       .then((puppy) => {
+  //         logger.log(logger.INFO, 'PUPPY-ROUTER GET /api/puppy responding with 200 code for successful get');
+  //         return response.json(puppy);
+  //       })
+  //       .catch((err) => {
+  //       // we will hit here if we have a mongodb error or parsing id error
+  //         if (err.message.toLowerCase().includes('cast to objectid failed')) {
+  //           logger.log(logger.ERROR, `PUPPY-ROUTER PUT: responding with 404 status code to mongdb error, objectId ${request.params.id} failed`);
+  //           return response.sendStatus(404);
+  //         }
+
+  //         // if we hit here, something else not accounted for occurred
+  //         logger.log(logger.ERROR, `PUPPY-ROUTER GET: 500 status code for unaccounted error ${JSON.stringify(err)}`);
+  //         return response.sendStatus(500);
+  //       });
   //   }
+
   return Puppy.findOne({ _id: request.params.id })
     .then((puppy) => {
       if (!puppy) {

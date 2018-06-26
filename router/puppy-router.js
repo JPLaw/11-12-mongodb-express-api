@@ -59,24 +59,24 @@ puppyRouter.get('/api/puppy/:id?', (request, response) => {
   // TODO:
   // if (!request.params.id) do logic here to return an array of all resources, else do the logic below
 
-  //   if (!request.params.id) {
-  //     return Puppy.find({})
-  //       .then((puppy) => {
-  //         logger.log(logger.INFO, 'PUPPY-ROUTER GET /api/puppy responding with 200 code for successful get');
-  //         return response.json(puppy);
-  //       })
-  //       .catch((err) => {
-  //       // we will hit here if we have a mongodb error or parsing id error
-  //         if (err.message.toLowerCase().includes('cast to objectid failed')) {
-  //           logger.log(logger.ERROR, `PUPPY-ROUTER PUT: responding with 404 status code to mongdb error, objectId ${request.params.id} failed`);
-  //           return response.sendStatus(404);
-  //         }
+  if (!request.params.id) {
+    return Puppy.find({})
+      .then((puppy) => {
+        logger.log(logger.INFO, 'PUPPY-ROUTER GET /api/puppy responding with 200 code for successful get');
+        return response.json(puppy);
+      })
+      .catch((err) => {
+        // we will hit here if we have a mongodb error or parsing id error
+        if (err.message.toLowerCase().includes('cast to objectid failed')) {
+          logger.log(logger.ERROR, `PUPPY-ROUTER PUT: responding with 404 status code to mongdb error, objectId ${request.params.id} failed`);
+          return response.sendStatus(404);
+        }
 
-  //         // if we hit here, something else not accounted for occurred
-  //         logger.log(logger.ERROR, `PUPPY-ROUTER GET: 500 status code for unaccounted error ${JSON.stringify(err)}`);
-  //         return response.sendStatus(500);
-  //       });
-  //   }
+        // if we hit here, something else not accounted for occurred
+        logger.log(logger.ERROR, `PUPPY-ROUTER GET: 500 status code for unaccounted error ${JSON.stringify(err)}`);
+        return response.sendStatus(500);
+      });
+  }
 
   return Puppy.findOne({ _id: request.params.id })
     .then((puppy) => {
@@ -122,28 +122,57 @@ puppyRouter.put('/api/puppy/:id?', jsonParser, (request, response) => {
       return response.json(updatedPuppy);
     })
     .catch((err) => {
-      // we will hit here if we have some misc. mongodb error or parsing id error
+      
       if (err.message.toLowerCase().includes('cast to objectid failed')) {
         logger.log(logger.ERROR, `PUPPY-ROUTER PUT: responding with 404 status code to mongdb error, objectId ${request.params.id} failed, ${err.message}`);
         return response.sendStatus(404);
       }
 
-      // a required property was not included, i.e. in this case, "name"
+      
       if (err.message.toLowerCase().includes('validation failed')) {
         logger.log(logger.ERROR, `PUPPY-ROUTER PUT: responding with 400 status code for bad request ${err.message}`);
         return response.sendStatus(400);
       }
-      // we passed in a title that already exists on a resource in the db because in our Note model, we set title to be "unique"
+      
       if (err.message.toLowerCase().includes('duplicate key')) {
         logger.log(logger.ERROR, `PUPPY-ROUTER PUT: responding with 409 status code for duplicate key ${err.message}`);
         return response.sendStatus(409);
       }
 
-      // if we hit here, something else not accounted for occurred
       logger.log(logger.ERROR, `PUPPY-ROUTER GET: 500 status code for unaccounted error ${JSON.stringify(err)}`);
       return response.sendStatus(500);
     });
   return undefined;
+});
+
+puppyRouter.delete('/api/puppy/:id?', (request, response) => {
+  logger.log(logger.INFO, 'PUPPY-ROUTER DELETE /api/puppy/:id = processing a request');
+  
+  if (!request.params.id) {
+    return response.sendStatus(404);
+  }
+  
+  return Puppy.deleteOne({ _id: request.params.id })
+    .then((data) => {
+      if (!data.n) {
+        logger.log(logger.INFO, 'PUPPY-ROUTER DELETE /api/puppy/:id responding with 404 status code for no puppy found');
+        return response.sendStatus(400);
+      }
+  
+      logger.log(logger.INFO, 'PUPPY-ROUTER DELETE api/puppy responding with 204 code for successful delete');
+      return response.sendStatus(204);
+    })
+    .catch((err) => {
+      // we will hit here if we have a mongodb error or parsing id error
+      if (err.message.toLowerCase().includes('cast to objectid failed')) {
+        logger.log(logger.ERROR, `PUPPY-ROUTER DELETE: responding with 404 status code to mongdb error, objectId ${request.params.id} failed`);
+        return response.sendStatus(404);
+      }
+  
+      // if we hit here, something else not accounted for occurred
+      logger.log(logger.ERROR, `PUPPY-ROUTER DELETE: 500 status code for unaccounted error ${JSON.stringify(err)}`);
+      return response.sendStatus(500);
+    });
 });
 
 export default puppyRouter;

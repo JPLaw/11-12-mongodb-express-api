@@ -58,9 +58,9 @@ puppyRouter.get('/api/puppy/:id?', (request, response) => {
 
   // TODO:
   // if (!request.params.id) do logic here to return an array of all resources, else do the logic below
-  if (!request.params.id) {
+  //   if (!request.params.id) {
     
-  }
+  //   }
   return Puppy.findOne({ _id: request.params.id })
     .then((puppy) => {
       if (!puppy) {
@@ -98,7 +98,7 @@ puppyRouter.put('/api/puppy/:id?', jsonParser, (request, response) => {
 
   Puppy.init()
     .then(() => {
-      return Puppy.findByIdAndUpdate(request.params.id, request.body, options)
+      return Puppy.findByIdAndUpdate(request.params.id, request.body, options);
     })
     .then((updatedPuppy) => {
       logger.log(logger.INFO, `PUPPY-ROUTER PUT - responding with a 200 status code for successful updated puppy: ${JSON.stringify(updatedPuppy)}`);

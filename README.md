@@ -1,4 +1,4 @@
-![cf](https://i.imgur.com/7v5ASc8.png) 11: Single Resource Express API
+[![Build Status](https://travis-ci.org/JPLaw/11-12-mongodb-express-api.svg?branch=master)](https://travis-ci.org/JPLaw/11-12-mongodb-express-api)  11: Single Resource Express API
 ======
 
 ## Submission Instructions
